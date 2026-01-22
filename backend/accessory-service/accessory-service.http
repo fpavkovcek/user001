@@ -1,0 +1,273 @@
+### Accessory Service API Tests
+### Use with REST Client VS Code extension
+
+@baseUrl = http://localhost:8030
+
+### ============================================
+### Health Check Endpoints
+### ============================================
+
+### Root endpoint - Service info
+GET {{baseUrl}}/ HTTP/1.1
+
+###
+
+### Health check - Database connectivity
+GET {{baseUrl}}/health HTTP/1.1
+
+### ============================================
+### Create Accessories
+### ============================================
+
+### Create a toy accessory
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Interactive Ball",
+    "type": "toy",
+    "price": 15.99,
+    "stock": 25,
+    "size": "L",
+    "imageUrl": "https://example.com/ball.jpg",
+    "description": "LED light-up ball that keeps pets entertained for hours"
+}
+
+###
+
+### Create a food accessory (low stock)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Premium Kibble",
+    "type": "food",
+    "price": 29.99,
+    "stock": 8,
+    "size": "M",
+    "imageUrl": "https://example.com/kibble.jpg",
+    "description": "High-quality dry food with natural ingredients"
+}
+
+###
+
+### Create a collar accessory
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "LED Safety Collar",
+    "type": "collar",
+    "price": 22.50,
+    "stock": 15,
+    "size": "M",
+    "imageUrl": "https://example.com/collar.jpg",
+    "description": "Rechargeable LED collar for nighttime visibility"
+}
+
+###
+
+### Create a bedding accessory (low stock)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Memory Foam Bed",
+    "type": "bedding",
+    "price": 49.99,
+    "stock": 5,
+    "size": "XL",
+    "imageUrl": "https://example.com/bed.jpg",
+    "description": "Orthopedic memory foam bed for senior pets"
+}
+
+###
+
+### Create a grooming accessory
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Slicker Brush",
+    "type": "grooming",
+    "price": 18.99,
+    "stock": 12,
+    "size": "M",
+    "description": "Professional grooming brush for all coat types"
+}
+
+### ============================================
+### Get Accessories (List & Filter)
+### ============================================
+
+### Get all accessories
+GET {{baseUrl}}/api/accessories HTTP/1.1
+
+###
+
+### Get accessories with pagination
+GET {{baseUrl}}/api/accessories?limit=5&offset=0 HTTP/1.1
+
+###
+
+### Search accessories by name
+GET {{baseUrl}}/api/accessories?search=ball HTTP/1.1
+
+###
+
+### Search in descriptions
+GET {{baseUrl}}/api/accessories?search=LED HTTP/1.1
+
+###
+
+### Filter by type (toy)
+GET {{baseUrl}}/api/accessories?type=toy HTTP/1.1
+
+###
+
+### Filter by type (food)
+GET {{baseUrl}}/api/accessories?type=food HTTP/1.1
+
+###
+
+### Get low stock items only
+GET {{baseUrl}}/api/accessories?lowStockOnly=true HTTP/1.1
+
+###
+
+### Combined filters - food items with low stock
+GET {{baseUrl}}/api/accessories?type=food&lowStockOnly=true HTTP/1.1
+
+### ============================================
+### Get Single Accessory
+### ============================================
+
+### Get seeded toy accessory
+GET {{baseUrl}}/api/accessories/seed-toy-001 HTTP/1.1
+
+###
+
+### Get seeded food accessory (low stock)
+GET {{baseUrl}}/api/accessories/seed-food-001 HTTP/1.1
+
+###
+
+### Get non-existent accessory (should return 404)
+GET {{baseUrl}}/api/accessories/non-existent-id HTTP/1.1
+
+### ============================================
+### Update Accessories
+### ============================================
+
+### Update stock only
+PATCH {{baseUrl}}/api/accessories/seed-toy-001 HTTP/1.1
+Content-Type: application/json
+
+{
+    "stock": 100
+}
+
+###
+
+### Update price and description
+PATCH {{baseUrl}}/api/accessories/seed-food-001 HTTP/1.1
+Content-Type: application/json
+
+{
+    "price": 39.99,
+    "description": "Updated: Premium organic dry food for adult dogs"
+}
+
+###
+
+### Update multiple fields
+PATCH {{baseUrl}}/api/accessories/seed-toy-001 HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Super Squeaky Ball",
+    "price": 14.99,
+    "stock": 75,
+    "size": "L"
+}
+
+### ============================================
+### Delete Accessories
+### ============================================
+
+### Delete seeded toy (use with caution)
+# DELETE {{baseUrl}}/api/accessories/seed-toy-001 HTTP/1.1
+
+###
+
+### Delete non-existent accessory (should return 404)
+DELETE {{baseUrl}}/api/accessories/non-existent-id HTTP/1.1
+
+### ============================================
+### Validation Tests (Expected Errors)
+### ============================================
+
+### Invalid type (should return 422)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Invalid Item",
+    "type": "furniture",
+    "price": 10.00,
+    "stock": 5,
+    "size": "M"
+}
+
+###
+
+### Negative price (should return 422)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Negative Price Item",
+    "type": "toy",
+    "price": -5.00,
+    "stock": 10,
+    "size": "S"
+}
+
+###
+
+### Missing required fields (should return 422)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Incomplete Item",
+    "price": 15.99
+}
+
+###
+
+### Invalid size (should return 422)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Invalid Size Item",
+    "type": "toy",
+    "price": 10.00,
+    "stock": 5,
+    "size": "XXL"
+}
+
+###
+
+### Name too long (should return 422)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "This name is way too long and exceeds the maximum allowed length of 200 characters which should trigger a validation error from the Pydantic model because we have set a max_length constraint on this field to prevent excessively long names from being stored in the database",
+    "type": "toy",
+    "price": 10.00,
+    "stock": 5,
+    "size": "M"
+}
