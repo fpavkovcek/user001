@@ -3,7 +3,10 @@
 # https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
 # Variables for the Pet Service API
-@baseUrl = http://localhost:8010
+# Use localhost for requests from within the codespace (no auth needed)
+# @baseUrl = http://localhost:8000
+# For external access via Codespaces, make sure port 8000 is set to "Public" in the Ports panel
+@baseUrl = https://fictional-telegram-4qv9r6wgp473xqp-8000.app.github.dev
 @contentType = application/json
 
 ###############################################################################
