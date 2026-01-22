@@ -115,8 +115,25 @@ echo "📡 Server will be available at: http://localhost:8030"
 echo "📚 API documentation: http://localhost:8030/docs"
 echo "🔍 Health check: http://localhost:8030/health"
 echo ""
-echo "Press Ctrl+C to stop the service"
-echo ""
 
-# Run the FastAPI application
-python main.py
+# Check if background mode is requested
+if [ "$1" = "--background" ] || [ "$1" = "-b" ]; then
+    echo "🔄 Starting in background mode..."
+    nohup python -m uvicorn main:app --host 0.0.0.0 --port 8030 > /tmp/accessory-service.log 2>&1 &
+    SERVICE_PID=$!
+    sleep 2
+    if curl -s http://localhost:8030/health > /dev/null 2>&1; then
+        echo "✅ Service started successfully (PID: $SERVICE_PID)"
+        echo "📋 Logs: /tmp/accessory-service.log"
+        echo "🛑 To stop: kill $SERVICE_PID"
+    else
+        echo "❌ Service failed to start. Check /tmp/accessory-service.log"
+        exit 1
+    fi
+else
+    echo "Press Ctrl+C to stop the service"
+    echo "(Use --background or -b flag to run in background)"
+    echo ""
+    # Run the FastAPI application in foreground
+    python main.py
+fi
