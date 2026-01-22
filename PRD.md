@@ -6,12 +6,12 @@
 - **Product / Feature Name**: PetPal Frontend, Pet Service, Activity Service, Accessory Service
 - **Author(s)**: GitHub Copilot
 - **Date**: 2025-11-18
-- **Revision**: v1.0
+- **Revision**: v1.1
 - **Status**: Draft
 - **Related Docs**: README.md, backend/pet-service/README.md, backend/activity-service/README.md, infra/cosmos.bicep
 
 ## 2. Summary
-PetPal needs a cohesive web experience that lets pet owners view, edit, and monitor pets alongside their activity history. This release aligns the React frontend with the Pet Service and Activity Service APIs so users can manage core pet data and log daily activities without touching underlying infrastructure. Success is measured by faster pet onboarding, richer engagement with activity timelines, and improved operational reliability of the services backing the UI.
+PetPal needs a cohesive web experience that lets pet owners view, edit, and monitor pets alongside their activity history and relevant accessories. This release aligns the React frontend with the Pet Service, Activity Service, and Accessory Service APIs so users can manage core pet data, log daily activities, and discover accessories that support pet care—all without touching underlying infrastructure. Success is measured by faster pet onboarding, richer engagement with activity timelines and accessories, and improved operational reliability of the services backing the UI.
 
 ## 3. Goals & Non-Goals
 | Goals | Non-Goals |
@@ -79,22 +79,27 @@ PetPal needs a cohesive web experience that lets pet owners view, edit, and moni
 ## 9a. Accessories
 
 ### Problem & Opportunity
-- Today, PetPal focuses on pets and activities but does not help users discover, organize, or reason about accessories that support pet care (toys, food, collars, bedding, grooming, etc.).
-- Caretakers and staff often rely on external tools or memory to decide what accessories to use or restock, which leads to inconsistent experiences and missed engagement opportunities.
-- By introducing a lightweight accessories capability, PetPal can increase stickiness (more time spent in the product), support operational tasks like stock monitoring, and lay the groundwork for future monetization without committing to full commerce flows.
+Today, PetPal effectively supports pet profiles and activity logging but does not address the adjacent need for managing accessories—items like toys, food, collars, bedding, grooming supplies—that directly support pet care. Caretakers and staff currently rely on external spreadsheets, memory, or separate systems to track what accessories are available, which items are running low, and what might be suitable for each pet. This fragmentation leads to:
+- Missed opportunities to engage users within PetPal (they leave the product to manage accessories elsewhere).
+- Inconsistent restocking workflows and surprise stockouts that disrupt care routines.
+- Limited cross-sell or discovery moments that could deepen user investment in the platform.
+
+By introducing a lightweight accessories capability, PetPal can become a more complete care hub. Users gain visibility into what accessories exist, which are relevant to their pets or activities, and which need attention. Over time, this foundation enables monetization experiments (affiliate links, marketplace features) and deeper engagement without the immediate complexity of full e-commerce or inventory management systems.
 
 ### Primary Roles & Needs
-- **Household Pet Owner**: Wants to quickly see which accessories are relevant for each pet (by type or activity) and to understand basic details like size, price, and whether an item is available.
-- **Caretaker/Staff**: Wants a fast way to scan all accessories, filter by type or low-stock status, and ensure they have appropriate items on hand for upcoming activities or stays.
-- **Admin / Inventory Owner**: Wants to maintain a simple, accurate catalog of accessories (create, update, retire) and quickly detect low-stock items so they can trigger restocking actions.
+- **Household Pet Owner**: Wants to quickly discover accessories that fit their pet's breed, size, or recent activities (e.g., harnesses for outdoor-loving dogs) and understand basic details like price and availability, all within PetPal so they don't need to context-switch.
+- **Caretaker/Staff**: Wants a fast, filterable view of all accessories to confirm availability before scheduling activities, identify low-stock items that need urgent attention, and ensure consistency in what is offered to different pets.
+- **Admin / Inventory Owner**: Wants to maintain a simple, accurate catalog (create new accessories, update details like stock or price, retire obsolete items) and receive early warnings when stock levels drop below safe thresholds so restocking can be scheduled proactively.
+- **Product Owner / Business Lead**: Wants to validate demand and interaction patterns with minimal investment before committing to more complex features like commerce integrations or advanced recommendation engines.
 
 ### User Stories
-- As a household pet owner, I want to browse accessories by type and basic filters so that I can quickly find items that are relevant to my pet without having to leave PetPal.
-- As a caretaker/staff member, I want to search and filter accessories (by type, name, and low-stock state) so that I can quickly identify what is available and what needs attention.
-- As a user viewing a pet profile, I want to see a small set of suggested accessories tied to that pet’s characteristics or recent activities so that I can discover useful items in context.
-- As an admin/inventory owner, I want to create, update, and retire accessories so that the catalog stays accurate and users do not see outdated or incorrect options.
-- As an admin/inventory owner, I want to monitor low-stock accessories in a dedicated view so that I can trigger restocking before items become unavailable.
-- As a product owner, I want to soft-launch accessories to a subset of users or as an optional dashboard panel so that we can validate demand and interaction patterns before investing in advanced features.
+1. As a household pet owner, I want to browse accessories by type (toys, food, grooming, etc.) and apply basic filters (e.g., suitable for small dogs) so that I can quickly find relevant items without leaving PetPal or sifting through irrelevant results.
+2. As a caretaker/staff member, I want to search accessories by name or filter by type and low-stock status so that I can quickly verify what is available for upcoming activities and flag items that need restocking.
+3. As a user viewing a pet profile or activity detail, I want to see a small, contextual set of suggested accessories (e.g., enrichment toys for a high-energy pet, grooming supplies for a long-haired breed) so that I can discover useful items at the moment they are most relevant.
+4. As an admin/inventory owner, I want to create a new accessory by specifying its type, name, description, price, and initial stock level so that the catalog stays current as new products become available.
+5. As an admin/inventory owner, I want to update accessory details (price, stock, description) or mark an accessory as retired so that users see accurate, up-to-date information and do not encounter discontinued items.
+6. As an admin/inventory owner, I want to filter accessories by low-stock status and see a dedicated view of items below a threshold so that I can prioritize restocking actions and avoid surprise stockouts.
+7. As a product owner, I want to soft-launch accessories as an optional dashboard panel or to a subset of users so that we can measure engagement (views, clicks, time spent) and validate the feature's value before broader rollout or deeper investment.
 
 ## 10. Dependencies
 - Internal: Pet Service (FastAPI), Activity Service (FastAPI), shared Cosmos DB account/emulator, infra scripts in `start.sh`.
@@ -123,3 +128,4 @@ PetPal needs a cohesive web experience that lets pet owners view, edit, and moni
 | Date | Author | Change |
 | --- | --- | --- |
 | 2025-11-18 | GitHub Copilot | Initial draft aligned to template for frontend + pet + activity scope. |
+| 2026-01-22 | GitHub Copilot | Enhanced Accessories section (v1.1) with expanded problem statement, user roles, comprehensive user stories, and clearer integration with existing pet and activity workflows. |
