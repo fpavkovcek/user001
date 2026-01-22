@@ -1,0 +1,388 @@
+# Activity Service API - REST Client Tests
+# This file can be used with the REST Client extension for VS Code
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables for the Activity Service API
+@baseUrl = http://localhost:8020
+@contentType = application/json
+
+###############################################################################
+# HEALTH CHECK ENDPOINTS
+###############################################################################
+
+# @name healthCheck
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrl}}/health HTTP/1.1
+
+###
+
+# @name rootEndpoint
+# Test the root endpoint for basic API info
+GET {{baseUrl}}/ HTTP/1.1
+
+###############################################################################
+# ACTIVITY MANAGEMENT - CRUD OPERATIONS
+###############################################################################
+
+# @name createActivity
+# Create a new activity (feed type)
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "feed",
+  "timestamp": "2025-10-06T19:00:00Z",
+  "notes": "Evening meal - premium kibble"
+}
+
+###
+
+# @name createWalkActivity
+# Create a walk activity for testing
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "walk",
+  "timestamp": "2025-10-06T18:30:00Z",
+  "notes": "30 minute neighborhood walk"
+}
+
+###
+
+# @name createPlayActivity
+# Create a play activity for testing
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p2",
+  "type": "play",
+  "timestamp": "2025-10-06T17:00:00Z",
+  "notes": "Indoor laser pointer session"
+}
+
+###
+
+# @name createVetActivity
+# Create a vet activity for testing
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "vet",
+  "timestamp": "2025-10-06T14:00:00Z",
+  "notes": "Annual checkup and vaccinations"
+}
+
+###
+
+# @name getAllActivities
+# Get all activities (no filters)
+GET {{baseUrl}}/api/activities HTTP/1.1
+
+###
+
+# @name getActivitiesByPetId
+# Get activities for specific pet
+GET {{baseUrl}}/api/activities?petId=p1 HTTP/1.1
+
+###
+
+# @name getActivitiesByType
+# Get activities by type (feed activities)
+GET {{baseUrl}}/api/activities?type=feed HTTP/1.1
+
+###
+
+# @name getActivitiesWithPagination
+# Get activities with pagination
+GET {{baseUrl}}/api/activities?limit=5&offset=0 HTTP/1.1
+
+###
+
+# @name getActivitiesDateRange
+# Get activities within date range (last 2 days)
+GET {{baseUrl}}/api/activities?from=2025-10-04T00:00:00Z&to=2025-10-06T23:59:59Z HTTP/1.1
+
+###
+
+# @name getActivitiesCombinedFilters
+# Combined filters - p1's walk activities from recent dates
+GET {{baseUrl}}/api/activities?petId=p1&type=walk&from=2025-10-01T00:00:00Z HTTP/1.1
+
+###
+
+# @name getActivityById
+# Get a specific activity by ID (replace {activityId} with actual ID from create response)
+# You'll need to run createActivity first and copy the ID from the response
+GET {{baseUrl}}/api/activities/{{createActivity.response.body.$.id}} HTTP/1.1
+
+###
+
+# @name deleteActivity
+# Delete an activity (use with caution!)
+DELETE {{baseUrl}}/api/activities/{{createPlayActivity.response.body.$.id}} HTTP/1.1
+
+###############################################################################
+# ERROR TESTING
+###############################################################################
+
+# @name testNotFound
+# Test 404 error with non-existent activity ID
+GET {{baseUrl}}/api/activities/non-existent-id HTTP/1.1
+
+###
+
+# @name testInvalidActivityType
+# Test validation error with invalid activity type
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "invalid_type",
+  "timestamp": "2025-10-06T19:00:00Z",
+  "notes": "This should fail"
+}
+
+###
+
+# @name testMissingRequiredFields
+# Test validation error with missing required fields
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "type": "feed",
+  "notes": "Missing petId and timestamp"
+}
+
+###
+
+# @name testInvalidTimestamp
+# Test validation error with invalid timestamp format
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "feed",
+  "timestamp": "invalid-date-format",
+  "notes": "This should fail"
+}
+
+###
+
+# @name testDeleteNonExistentActivity
+# Test 404 error when deleting non-existent activity
+DELETE {{baseUrl}}/api/activities/non-existent-activity-id HTTP/1.1
+
+###############################################################################
+# SEARCH AND FILTER TESTING
+###############################################################################
+
+# @name searchByMultiplePets
+# Search activities for multiple pets (will need to be done separately)
+GET {{baseUrl}}/api/activities?petId=p1 HTTP/1.1
+
+###
+
+GET {{baseUrl}}/api/activities?petId=p2 HTTP/1.1
+
+###
+
+# @name searchFeedActivities
+# Get all feeding activities
+GET {{baseUrl}}/api/activities?type=feed HTTP/1.1
+
+###
+
+# @name searchWalkActivities  
+# Get all walk activities
+GET {{baseUrl}}/api/activities?type=walk HTTP/1.1
+
+###
+
+# @name searchPlayActivities
+# Get all play activities
+GET {{baseUrl}}/api/activities?type=play HTTP/1.1
+
+###
+
+# @name searchVetActivities
+# Get all vet activities
+GET {{baseUrl}}/api/activities?type=vet HTTP/1.1
+
+###
+
+# @name searchTrainActivities
+# Get all training activities
+GET {{baseUrl}}/api/activities?type=train HTTP/1.1
+
+###
+
+# @name searchRecentActivities
+# Get activities from today
+GET {{baseUrl}}/api/activities?from=2025-10-06T00:00:00Z HTTP/1.1
+
+###
+
+# @name searchOlderActivities
+# Get activities from yesterday
+GET {{baseUrl}}/api/activities?from=2025-10-05T00:00:00Z&to=2025-10-05T23:59:59Z HTTP/1.1
+
+###############################################################################
+# API DOCUMENTATION ENDPOINTS
+###############################################################################
+
+# @name getOpenAPISchema
+# Get the OpenAPI schema (JSON format)
+GET {{baseUrl}}/openapi.json HTTP/1.1
+
+###
+
+# @name swaggerUI
+# Access Swagger UI (this will return HTML)
+GET {{baseUrl}}/docs HTTP/1.1
+
+###
+
+# @name redocUI
+# Access ReDoc UI (this will return HTML)
+GET {{baseUrl}}/redoc HTTP/1.1
+
+###############################################################################
+# BULK TESTING
+###############################################################################
+
+# @name createMultipleActivities
+# Create multiple activities for testing
+
+# Morning routine for p1
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "feed",
+  "timestamp": "2025-10-06T07:30:00Z",
+  "notes": "Morning breakfast - dry food"
+}
+
+###
+
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1", 
+  "type": "walk",
+  "timestamp": "2025-10-06T08:00:00Z",
+  "notes": "Quick morning walk"
+}
+
+###
+
+# Afternoon activities for p2
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p2",
+  "type": "play",
+  "timestamp": "2025-10-06T15:30:00Z",
+  "notes": "Feather toy play session"
+}
+
+###
+
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p2",
+  "type": "feed",
+  "timestamp": "2025-10-06T16:00:00Z",
+  "notes": "Afternoon treats - salmon bits"
+}
+
+###
+
+# Training session
+POST {{baseUrl}}/api/activities HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "petId": "p1",
+  "type": "train",
+  "timestamp": "2025-10-06T19:30:00Z",
+  "notes": "Sit and stay commands practice"
+}
+
+###
+
+# @name testPaginationFirst
+# Test pagination - first page
+GET {{baseUrl}}/api/activities?limit=3&offset=0 HTTP/1.1
+
+###
+
+# @name testPaginationSecond
+# Test pagination - second page
+GET {{baseUrl}}/api/activities?limit=3&offset=3 HTTP/1.1
+
+###############################################################################
+# PERFORMANCE TESTING
+###############################################################################
+
+# @name stressTestAllActivities
+# Test performance with all activities
+GET {{baseUrl}}/api/activities?limit=100 HTTP/1.1
+
+###
+
+# @name stressTestPetFilter
+# Test performance with pet filter
+GET {{baseUrl}}/api/activities?petId=p1&limit=50 HTTP/1.1
+
+###
+
+# @name stressTestTypeFilter
+# Test performance with type filter
+GET {{baseUrl}}/api/activities?type=feed&limit=50 HTTP/1.1
+
+###############################################################################
+# DEVELOPMENT HELPERS
+###############################################################################
+
+# Instructions for use:
+# 
+# 1. Start the Activity Service API:
+#    ./start.sh
+#    or
+#    python main.py
+#    or
+#    uvicorn main:app --host 0.0.0.0 --port 8001
+#
+# 2. Install REST Client extension in VS Code:
+#    https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+#
+# 3. Open this file in VS Code
+#
+# 4. Click "Send Request" link above each request or use Ctrl+Alt+R
+#
+# 5. For requests that use response data (like getActivityById), 
+#    run the prerequisite requests first (like createActivity)
+#
+# 6. The health check will show "healthy" status when CosmosDB is available
+#    If database/container doesn't exist, they will be created automatically with sample activities:
+#    - a1: Walk activity for p1 - "Park loop"
+#    - a2: Feed activity for p2 - "Tuna pouch"  
+#    - a3: Play activity for p1 - "Frisbee"
+#
+# Happy testing! 🚀

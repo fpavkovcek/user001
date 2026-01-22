@@ -1,0 +1,87 @@
+# Deployment Health Check Tests for PetPal Microservices
+# 
+# This file tests the /health endpoints of all deployed services to validate successful deployment
+# Use with VS Code REST Client extension or similar HTTP client
+#
+# Prerequisites:
+# 1. Services must be deployed to Azure Container Apps
+# 2. Set the BASE_URL variables below to your deployed service FQDNs
+# 
+# Usage:
+# - Click "Send Request" above each request to test individual services
+# - Use "Send All Requests" to validate all services at once
+#
+# Expected Response: HTTP 200 with JSON containing:
+# {
+#   "status": "healthy",
+#   "version": "1.0.0",
+#   "database": { "status": "connected", ... }
+# }
+
+### Variables - Replace with your actual Container App FQDNs
+# Get these from: az containerapp show --name <app-name> --resource-group <rg> --query properties.configuration.ingress.fqdn -o tsv
+
+@petServiceUrl = https://your-pet-service.azurecontainerapps.io
+@activityServiceUrl = https://your-activity-service.azurecontainerapps.io
+@accessoryServiceUrl = https://your-accessory-service.azurecontainerapps.io
+
+### Test 1: Pet Service Health Check
+# Tests: Pet Service deployment, port 8010, Cosmos DB connection
+GET {{petServiceUrl}}/health
+Accept: application/json
+
+###
+
+### Test 2: Activity Service Health Check  
+# Tests: Activity Service deployment, port 8020, Cosmos DB connection
+GET {{activityServiceUrl}}/health
+Accept: application/json
+
+###
+
+### Test 3: Accessory Service Health Check
+# Tests: Accessory Service deployment, port 8030, Cosmos DB connection
+GET {{accessoryServiceUrl}}/health
+Accept: application/json
+
+###
+
+### Test 4: Pet Service Root Endpoint
+# Tests: Basic service availability and API metadata
+GET {{petServiceUrl}}/
+Accept: application/json
+
+###
+
+### Test 5: Activity Service Root Endpoint
+# Tests: Basic service availability and API metadata
+GET {{activityServiceUrl}}/
+Accept: application/json
+
+###
+
+### Test 6: Accessory Service Root Endpoint
+# Tests: Basic service availability and API metadata
+GET {{accessoryServiceUrl}}/
+Accept: application/json
+
+###
+
+### Test 7: Pet Service - List Pets (Functional Test)
+# Validates end-to-end functionality with Cosmos DB
+GET {{petServiceUrl}}/api/pets?limit=5
+Accept: application/json
+
+###
+
+### Test 8: Activity Service - List Activities (Functional Test)
+# Validates end-to-end functionality with Cosmos DB
+GET {{activityServiceUrl}}/api/activities?limit=5
+Accept: application/json
+
+###
+
+### Test 9: Accessory Service - List Accessories (Functional Test)
+# Validates end-to-end functionality with Cosmos DB
+GET {{accessoryServiceUrl}}/api/accessories?limit=5
+Accept: application/json

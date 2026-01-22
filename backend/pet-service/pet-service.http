@@ -1,0 +1,323 @@
+# Pet Service API - REST Client Tests
+# This file can be used with the REST Client extension for VS Code
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables for the Pet Service API
+@baseUrl = http://localhost:8010
+@contentType = application/json
+
+###############################################################################
+# HEALTH CHECK ENDPOINTS
+###############################################################################
+
+# @name healthCheck
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrl}}/health HTTP/1.1
+
+###
+
+# @name rootEndpoint
+# Test the root endpoint for basic API info
+GET {{baseUrl}}/ HTTP/1.1
+
+###############################################################################
+# PET MANAGEMENT - CRUD OPERATIONS
+###############################################################################
+
+# @name createPet
+# Create a new pet
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Luna",
+  "species": "dog",
+  "ageYears": 3,
+  "health": 85,
+  "happiness": 90,
+  "energy": 75,
+  "avatarUrl": "https://example.com/luna.jpg",
+  "notes": "Friendly golden retriever who loves playing fetch"
+}
+
+###
+
+# @name createCat
+# Create a cat pet for testing
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Whiskers",
+  "species": "cat",
+  "ageYears": 2,
+  "health": 95,
+  "happiness": 80,
+  "energy": 60,
+  "avatarUrl": "https://example.com/whiskers.jpg",
+  "notes": "Independent cat who enjoys sunny windowsills"
+}
+
+###
+
+# @name createBird
+# Create a bird pet for testing
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Chirpy",
+  "species": "bird",
+  "ageYears": 1,
+  "health": 100,
+  "happiness": 85,
+  "energy": 95,
+  "avatarUrl": "https://example.com/chirpy.jpg",
+  "notes": "Colorful parrot who loves to sing"
+}
+
+###
+
+# @name getAllPets
+# Get all pets (no filters)
+GET {{baseUrl}}/api/pets HTTP/1.1
+
+###
+
+# @name searchDogs
+# Search for dogs only
+GET {{baseUrl}}/api/pets?species=dog HTTP/1.1
+
+###
+
+# @name searchByName
+# Search pets by name (use part of a name)
+GET {{baseUrl}}/api/pets?search=luna HTTP/1.1
+
+###
+
+# @name searchWithPagination
+# Get pets with pagination
+GET {{baseUrl}}/api/pets?limit=5&offset=0 HTTP/1.1
+
+###
+
+# @name searchCombined
+# Combined search - cats with pagination
+GET {{baseUrl}}/api/pets?species=cat&limit=10&offset=0 HTTP/1.1
+
+###
+
+# @name getPetById
+# Get a specific pet by ID (replace {petId} with actual ID from create response)
+# You'll need to run createPet first and copy the ID from the response
+GET {{baseUrl}}/api/pets/{{createPet.response.body.$.id}} HTTP/1.1
+
+###
+
+# @name updatePet
+# Update a pet's health and happiness (partial update)
+PATCH {{baseUrl}}/api/pets/{{createPet.response.body.$.id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "health": 90,
+  "happiness": 95,
+  "notes": "Updated after vet visit - feeling much better!"
+}
+
+###
+
+# @name updatePetName
+# Update only the pet's name
+PATCH {{baseUrl}}/api/pets/{{createPet.response.body.$.id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Luna the Great"
+}
+
+###
+
+# @name deletePet
+# Delete a pet (use with caution!)
+DELETE {{baseUrl}}/api/pets/{{createCat.response.body.$.id}} HTTP/1.1
+
+###############################################################################
+# ERROR TESTING
+###############################################################################
+
+# @name testNotFound
+# Test 404 error with non-existent pet ID
+GET {{baseUrl}}/api/pets/non-existent-id HTTP/1.1
+
+###
+
+# @name testInvalidSpecies
+# Test validation error with invalid species
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Invalid Pet",
+  "species": "dragon",
+  "ageYears": 100,
+  "health": 50,
+  "happiness": 50,
+  "energy": 50
+}
+
+###
+
+# @name testMissingRequiredFields
+# Test validation error with missing required fields
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "species": "dog",
+  "health": 50
+}
+
+###
+
+# @name testInvalidAge
+# Test validation error with invalid age
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Old Pet",
+  "species": "dog",
+  "ageYears": 999,
+  "health": 50,
+  "happiness": 50,
+  "energy": 50
+}
+
+###############################################################################
+# API DOCUMENTATION ENDPOINTS
+###############################################################################
+
+# @name getOpenAPISchema
+# Get the OpenAPI schema (JSON format)
+GET {{baseUrl}}/openapi.json HTTP/1.1
+
+###
+
+# @name swaggerUI
+# Access Swagger UI (this will return HTML)
+GET {{baseUrl}}/docs HTTP/1.1
+
+###
+
+# @name redocUI
+# Access ReDoc UI (this will return HTML)
+GET {{baseUrl}}/redoc HTTP/1.1
+
+###############################################################################
+# BULK TESTING
+###############################################################################
+
+# @name createMultiplePets
+# Create multiple pets for testing
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Buddy",
+  "species": "dog",
+  "ageYears": 5,
+  "health": 80,
+  "happiness": 85,
+  "energy": 70,
+  "notes": "Loyal companion"
+}
+
+###
+
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Mittens",
+  "species": "cat",
+  "ageYears": 4,
+  "health": 90,
+  "happiness": 75,
+  "energy": 65,
+  "notes": "Loves to nap"
+}
+
+###
+
+POST {{baseUrl}}/api/pets HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Tweety",
+  "species": "bird",
+  "ageYears": 2,
+  "health": 95,
+  "happiness": 90,
+  "energy": 85,
+  "notes": "Yellow canary"
+}
+
+###
+
+# @name testPagination
+# Test pagination with multiple pets
+GET {{baseUrl}}/api/pets?limit=2&offset=0 HTTP/1.1
+
+###
+
+# @name testPaginationNext
+# Test next page
+GET {{baseUrl}}/api/pets?limit=2&offset=2 HTTP/1.1
+
+###############################################################################
+# PERFORMANCE TESTING
+###############################################################################
+
+# @name stressTestSearch
+# Test search performance
+GET {{baseUrl}}/api/pets?search=pet&limit=100 HTTP/1.1
+
+###
+
+# @name stressTestSpeciesFilter
+# Test species filter performance
+GET {{baseUrl}}/api/pets?species=dog&limit=50 HTTP/1.1
+
+###############################################################################
+# DEVELOPMENT HELPERS
+###############################################################################
+
+# Instructions for use:
+# 
+# 1. Start the Pet Service API:
+#    ./start.sh
+#    or
+#    python main.py
+#    or
+#    uvicorn main:app --host 0.0.0.0 --port 8000
+#
+# 2. Install REST Client extension in VS Code:
+#    https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+#
+# 3. Open this file in VS Code
+#
+# 4. Click "Send Request" link above each request or use Ctrl+Alt+R
+#
+# 5. For requests that use response data (like getPetById), 
+#    run the prerequisite requests first (like createPet)
+#
+# 6. The health check will show "healthy" status when CosmosDB is available
+#    If database/container doesn't exist, they will be created automatically with sample pets:
+#    - Luna (dog): "Loves fetch"
+#    - Milo (cat): "Window watcher" 
+#    - Pico (bird): "Chirpy"
+#
+# Happy testing! 🚀

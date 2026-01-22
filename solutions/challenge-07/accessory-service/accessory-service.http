@@ -1,0 +1,409 @@
+# Accessory Service API - REST Client Tests
+# This file can be used with the REST Client extension for VS Code
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables for the Accessory Service API
+@baseUrl = http://localhost:8030
+@contentType = application/json
+
+###############################################################################
+# HEALTH CHECK ENDPOINTS
+###############################################################################
+
+# @name healthCheck
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrl}}/health HTTP/1.1
+
+###
+
+# @name rootEndpoint
+# Test the root endpoint for basic API info
+GET {{baseUrl}}/ HTTP/1.1
+
+###############################################################################
+# ACCESSORY MANAGEMENT - CRUD OPERATIONS
+###############################################################################
+
+# @name createAccessory
+# Create a new accessory (toy type)
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Interactive Ball",
+  "type": "toy",
+  "price": 15.99,
+  "stock": 25,
+  "size": "L",
+  "imageUrl": "https://example.com/ball.jpg",
+  "description": "LED light-up ball that keeps pets entertained for hours"
+}
+
+###
+
+# @name createFoodAccessory
+# Create a food accessory for testing
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Premium Kibble",
+  "type": "food",
+  "price": 29.99,
+  "stock": 8,
+  "size": "M",
+  "imageUrl": "https://example.com/kibble.jpg",
+  "description": "High-quality dry food with natural ingredients"
+}
+
+###
+
+# @name createCollarAccessory
+# Create a collar accessory for testing
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "LED Safety Collar",
+  "type": "collar",
+  "price": 22.50,
+  "stock": 15,
+  "size": "M",
+  "imageUrl": "https://example.com/collar.jpg",
+  "description": "Rechargeable LED collar for nighttime visibility"
+}
+
+###
+
+# @name createBeddingAccessory
+# Create a bedding accessory for testing
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Memory Foam Bed",
+  "type": "bedding",
+  "price": 49.99,
+  "stock": 5,
+  "size": "XL",
+  "imageUrl": "https://example.com/bed.jpg",
+  "description": "Orthopedic memory foam bed for senior pets"
+}
+
+###
+
+# @name getAllAccessories
+# Get all accessories (no filters)
+GET {{baseUrl}}/api/accessories HTTP/1.1
+
+###
+
+# @name getAccessoriesByType
+# Get accessories by type (toys)
+GET {{baseUrl}}/api/accessories?type=toy HTTP/1.1
+
+###
+
+# @name searchByName
+# Search accessories by name
+GET {{baseUrl}}/api/accessories?search=collar HTTP/1.1
+
+###
+
+# @name getLowStockItems
+# Get only low stock items
+GET {{baseUrl}}/api/accessories?lowStockOnly=true HTTP/1.1
+
+###
+
+# @name getAccessoriesWithPagination
+# Get accessories with pagination
+GET {{baseUrl}}/api/accessories?limit=5&offset=0 HTTP/1.1
+
+###
+
+# @name getCombinedFilters
+# Combined search - food items with low stock
+GET {{baseUrl}}/api/accessories?type=food&lowStockOnly=true HTTP/1.1
+
+###
+
+# @name getAccessoryById
+# Get a specific accessory by ID (replace {accessoryId} with actual ID from create response)
+# You'll need to run createAccessory first and copy the ID from the response
+GET {{baseUrl}}/api/accessories/{{createAccessory.response.body.$.id}} HTTP/1.1
+
+###
+
+# @name updateAccessory
+# Update an accessory's price and stock (partial update)
+PATCH {{baseUrl}}/api/accessories/{{createAccessory.response.body.$.id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "price": 18.99,
+  "stock": 30,
+  "description": "Updated: LED light-up ball with improved battery life"
+}
+
+###
+
+# @name updateAccessoryStock
+# Update only the stock quantity
+PATCH {{baseUrl}}/api/accessories/{{createFoodAccessory.response.body.$.id}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "stock": 20
+}
+
+###
+
+# @name deleteAccessory
+# Delete an accessory (use with caution!)
+DELETE {{baseUrl}}/api/accessories/{{createCollarAccessory.response.body.$.id}} HTTP/1.1
+
+###############################################################################
+# ERROR TESTING
+###############################################################################
+
+# @name testNotFound
+# Test 404 error with non-existent accessory ID
+GET {{baseUrl}}/api/accessories/non-existent-id HTTP/1.1
+
+###
+
+# @name testInvalidType
+# Test validation error with invalid accessory type
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Invalid Item",
+  "type": "invalid_type",
+  "price": 10.00,
+  "stock": 5,
+  "size": "M"
+}
+
+###
+
+# @name testMissingRequiredFields
+# Test validation error with missing required fields
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Incomplete Item",
+  "price": 15.99
+}
+
+###
+
+# @name testNegativePrice
+# Test validation error with negative price
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Negative Price Item",
+  "type": "toy",
+  "price": -5.00,
+  "stock": 10,
+  "size": "S"
+}
+
+###
+
+# @name testInvalidSize
+# Test validation error with invalid size
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Invalid Size Item",
+  "type": "toy",
+  "price": 10.00,
+  "stock": 5,
+  "size": "XXL"
+}
+
+###############################################################################
+# SEARCH AND FILTER TESTING
+###############################################################################
+
+# @name searchToys
+# Get all toy accessories
+GET {{baseUrl}}/api/accessories?type=toy HTTP/1.1
+
+###
+
+# @name searchFood
+# Get all food accessories  
+GET {{baseUrl}}/api/accessories?type=food HTTP/1.1
+
+###
+
+# @name searchCollars
+# Get all collar accessories
+GET {{baseUrl}}/api/accessories?type=collar HTTP/1.1
+
+###
+
+# @name searchBedding
+# Get all bedding accessories
+GET {{baseUrl}}/api/accessories?type=bedding HTTP/1.1
+
+###
+
+# @name searchGrooming
+# Get all grooming accessories
+GET {{baseUrl}}/api/accessories?type=grooming HTTP/1.1
+
+###
+
+# @name searchOther
+# Get all other accessories
+GET {{baseUrl}}/api/accessories?type=other HTTP/1.1
+
+###
+
+# @name searchByDescription
+# Search in descriptions
+GET {{baseUrl}}/api/accessories?search=LED HTTP/1.1
+
+###
+
+# @name searchLowStock
+# Get only low stock items (stock < 10)
+GET {{baseUrl}}/api/accessories?lowStockOnly=true HTTP/1.1
+
+###############################################################################
+# API DOCUMENTATION ENDPOINTS
+###############################################################################
+
+# @name getOpenAPISchema
+# Get the OpenAPI schema (JSON format)
+GET {{baseUrl}}/openapi.json HTTP/1.1
+
+###
+
+# @name swaggerUI
+# Access Swagger UI (this will return HTML)
+GET {{baseUrl}}/docs HTTP/1.1
+
+###
+
+# @name redocUI
+# Access ReDoc UI (this will return HTML)
+GET {{baseUrl}}/redoc HTTP/1.1
+
+###############################################################################
+# BULK TESTING
+###############################################################################
+
+# @name createMultipleAccessories
+# Create multiple accessories for testing
+
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Rubber Bone",
+  "type": "toy",
+  "price": 6.99,
+  "stock": 20,
+  "size": "M",
+  "description": "Flavored chew toy for dental health"
+}
+
+###
+
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Grain-Free Treats",
+  "type": "food",
+  "price": 12.49,
+  "stock": 2,
+  "size": "S",
+  "description": "Limited ingredient training treats"
+}
+
+###
+
+POST {{baseUrl}}/api/accessories HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "name": "Slicker Brush",
+  "type": "grooming",
+  "price": 18.99,
+  "stock": 12,
+  "size": "M",
+  "description": "Professional grooming brush for all coat types"
+}
+
+###
+
+# @name testPaginationFirst
+# Test pagination - first page
+GET {{baseUrl}}/api/accessories?limit=3&offset=0 HTTP/1.1
+
+###
+
+# @name testPaginationSecond
+# Test pagination - second page
+GET {{baseUrl}}/api/accessories?limit=3&offset=3 HTTP/1.1
+
+###############################################################################
+# PERFORMANCE TESTING
+###############################################################################
+
+# @name stressTestAllAccessories
+# Test performance with all accessories
+GET {{baseUrl}}/api/accessories?limit=100 HTTP/1.1
+
+###
+
+# @name stressTestTypeFilter
+# Test performance with type filter
+GET {{baseUrl}}/api/accessories?type=toy&limit=50 HTTP/1.1
+
+###
+
+# @name stressTestSearch
+# Test search performance
+GET {{baseUrl}}/api/accessories?search=pet&limit=50 HTTP/1.1
+
+###############################################################################
+# DEVELOPMENT HELPERS
+###############################################################################
+
+# Instructions for use:
+# 
+# 1. Start the Accessory Service API:
+#    ./start.sh
+#    or
+#    python main.py
+#    or
+#    uvicorn main:app --host 0.0.0.0 --port 8002
+#
+# 2. Install REST Client extension in VS Code:
+#    https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+#
+# 3. Open this file in VS Code
+#
+# 4. Click "Send Request" link above each request or use Ctrl+Alt+R
+#
+# 5. For requests that use response data (like getAccessoryById), 
+#    run the prerequisite requests first (like createAccessory)
+#
+# 6. The health check will show "healthy" status when CosmosDB is available
+#    If database/container doesn't exist, they will be created automatically with sample accessories:
+#    - x1: Chew Toy (toy) - "Durable rope" - $8.99, stock: 12
+#    - x2: Salmon Treats (food) - "Soft chews" - $5.49, stock: 3 (low stock!)
+#
+# Happy testing! 🚀

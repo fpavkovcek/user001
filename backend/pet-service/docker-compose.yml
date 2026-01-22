@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  pet-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      # CosmosDB configuration - set these in your .env file
+      - COSMOS_ENDPOINT=${COSMOS_ENDPOINT}
+      - COSMOS_DATABASE_NAME=${COSMOS_DATABASE_NAME:-petservice}
+      - COSMOS_CONTAINER_NAME=${COSMOS_CONTAINER_NAME:-pets}
+      # Azure authentication (optional)
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+    env_file:
+      - .env
+    volumes:
+      # Mount source code for development (comment out for production)
+      - .:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# For production deployment, you might add:
+# - Nginx reverse proxy
+# - Redis for caching
+# - Logging services
+# - Monitoring services
+
+networks:
+  default:
+    name: pet-service-network

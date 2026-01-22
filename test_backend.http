@@ -1,0 +1,27 @@
+# Backend Service API - REST Client Tests
+
+# Variables for the Pet Service API
+@baseUrlPets = http://localhost:8010
+@baseUrlActivities = http://localhost:8020
+@baseUrlAccessories = http://localhost:8030
+
+###############################################################################
+# HEALTH CHECK ENDPOINTS
+###############################################################################
+
+# @name healthCheckPets
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrlPets}}/health HTTP/1.1
+
+###
+# @name healthCheckActivities
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrlActivities}}/health HTTP/1.1
+
+###
+# @name healthCheckAccessories
+# Test the health endpoint to verify database connectivity
+# If database/container doesn't exist, it will be created automatically with sample data
+GET {{baseUrlAccessories}}/health HTTP/1.1
