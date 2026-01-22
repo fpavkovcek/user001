@@ -3,17 +3,19 @@
 Capture system context, component boundaries, and key decisions that drive implementation.
 
 ## Context
-PetPal is a cohesive web experience that allows pet owners to view, edit, and monitor pets alongside their activity history. The system unifies pet management and activity logging into a single dashboard, backed by scalable cloud-native services.
+PetPal is a cohesive web experience that allows pet owners to view, edit, and monitor pets alongside their activity history and relevant accessories. The system unifies pet management, activity logging, and accessory discovery into a single dashboard, backed by scalable cloud-native services.
 
 **Business Drivers:**
 - Faster pet onboarding.
 - Richer engagement with activity timelines.
 - Improved operational reliability.
+- Accessory discovery and inventory management.
 
 **Personas:**
-- **Household Pet Owner**: Quick overview, edit details, log walks/feeds.
-- **Caretaker/Staff**: Manage multiple pets, filter by status.
-- **Clinic/Trainer Partner**: Record structured visits.
+- **Household Pet Owner**: Quick overview, edit details, log walks/feeds, discover accessories.
+- **Caretaker/Staff**: Manage multiple pets, filter by status, monitor accessory stock.
+- **Clinic/Trainer Partner**: Record structured visits, recommend accessories.
+- **Admin/Inventory Owner**: Maintain accessory catalog, track low-stock items.
 
 ## Views
 
@@ -84,6 +86,7 @@ graph TB
 | ----------------------- | ----------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
 | **High Load**           | Traffic spikes to 10x normal load         | Users continue to access dashboard | Container Apps scale out replicas; Cosmos DB scales RUs automatically.   |
 | **Database Throttling** | Cosmos DB returns 429 (Too Many Requests) | Service attempts to write data     | SDK automatically retries with backoff; Request succeeds within timeout. |
+| **Low Stock Detection** | Accessory stock drops below 10 units      | User filters by low stock          | Only accessories with stock < 10 are returned for restocking action.     |
 
 ## Decision References
 -   **ADR-001**: Use of Azure Cosmos DB for schema flexibility and scalability.
