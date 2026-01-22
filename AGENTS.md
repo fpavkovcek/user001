@@ -1,0 +1,5 @@
+You task is to create AGETNS.md with robust instructions based on #fetch https://agents.md/
+- Use our `AGENTS.md` template from https://raw.githubusercontent.com/CZSK-MicroHacks/MicroHack-GitHub-engineering-constitution/refs/heads/main/templates/AGENTS.md
+- In our project we use Python, you can see extended coding standards here: https://raw.githubusercontent.com/CZSK-MicroHacks/MicroHack-GitHub-engineering-constitution/refs/heads/main/standards/python.md
+- For Infrastructure as Code we use Bicep, see extended standards here: https://raw.githubusercontent.com/CZSK-MicroHacks/MicroHack-GitHub-engineering-constitution/refs/heads/main/standards/bicep.md
+- This project is targeting simplicity to facilitate learning, emphasize that in `AGENTS.md` - do not overcomplicate, do not do premature abstractions and so on
