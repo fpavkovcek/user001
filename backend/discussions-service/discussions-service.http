@@ -1,0 +1,286 @@
+# Discussions Service API Test File
+# Use with VS Code REST Client extension or similar
+
+@baseUrl = http://localhost:8002
+
+### ============================================================
+### Health Endpoints
+### ============================================================
+
+### Root endpoint
+GET {{baseUrl}}/
+
+### Health check
+GET {{baseUrl}}/health
+
+
+### ============================================================
+### Room Operations
+### ============================================================
+
+### Create a public room
+# @name createPublicRoom
+POST {{baseUrl}}/api/rooms
+Content-Type: application/json
+
+{
+    "name": "Dog Lovers Chat",
+    "description": "A room for all dog enthusiasts to share stories and tips!",
+    "is_private": false,
+    "owner_id": "user-001"
+}
+
+###
+@publicRoomId = {{createPublicRoom.response.body.id}}
+
+### Create a private room
+# @name createPrivateRoom
+POST {{baseUrl}}/api/rooms
+Content-Type: application/json
+
+{
+    "name": "VIP Pet Club",
+    "description": "Exclusive discussions for premium members",
+    "is_private": true,
+    "owner_id": "user-001"
+}
+
+###
+@privateRoomId = {{createPrivateRoom.response.body.id}}
+
+### List all rooms
+GET {{baseUrl}}/api/rooms
+
+### List public rooms only
+GET {{baseUrl}}/api/rooms?is_private=false
+
+### Search rooms
+GET {{baseUrl}}/api/rooms?search=Dog
+
+### Get specific room
+GET {{baseUrl}}/api/rooms/{{publicRoomId}}
+
+### Update room
+PATCH {{baseUrl}}/api/rooms/{{publicRoomId}}
+Content-Type: application/json
+
+{
+    "description": "Updated: The best place to discuss dogs!"
+}
+
+
+### ============================================================
+### Room Membership
+### ============================================================
+
+### Add member to room
+POST {{baseUrl}}/api/rooms/{{publicRoomId}}/members
+Content-Type: application/json
+
+{
+    "user_id": "user-002"
+}
+
+### Add another member
+POST {{baseUrl}}/api/rooms/{{publicRoomId}}/members
+Content-Type: application/json
+
+{
+    "user_id": "user-003"
+}
+
+### Remove member from room
+DELETE {{baseUrl}}/api/rooms/{{publicRoomId}}/members/user-003
+
+
+### ============================================================
+### Message Operations
+### ============================================================
+
+### Post a message
+# @name createMessage
+POST {{baseUrl}}/api/messages
+Content-Type: application/json
+
+{
+    "content": "Hello everyone! My golden retriever just learned a new trick!",
+    "author_id": "user-001",
+    "room_id": "{{publicRoomId}}"
+}
+
+###
+@messageId = {{createMessage.response.body.id}}
+
+### Post a message with attachment
+# @name createMessageWithAttachment
+POST {{baseUrl}}/api/messages
+Content-Type: application/json
+
+{
+    "content": "Check out my adorable puppy!",
+    "author_id": "user-002",
+    "room_id": "{{publicRoomId}}",
+    "attachments": [
+        {
+            "filename": "puppy.jpg",
+            "content_type": "image/jpeg",
+            "size_bytes": 102400,
+            "url": "https://storage.example.com/attachments/puppy.jpg"
+        }
+    ]
+}
+
+###
+@messageWithAttachmentId = {{createMessageWithAttachment.response.body.id}}
+
+### Reply to a message (create thread)
+# @name createReply
+POST {{baseUrl}}/api/messages
+Content-Type: application/json
+
+{
+    "content": "That's amazing! What trick did your retriever learn?",
+    "author_id": "user-002",
+    "room_id": "{{publicRoomId}}",
+    "parent_message_id": "{{messageId}}"
+}
+
+### Reply to the reply
+POST {{baseUrl}}/api/messages
+Content-Type: application/json
+
+{
+    "content": "He learned to fetch the newspaper! Took 3 weeks of training.",
+    "author_id": "user-001",
+    "room_id": "{{publicRoomId}}",
+    "parent_message_id": "{{messageId}}"
+}
+
+### List all messages in room
+GET {{baseUrl}}/api/rooms/{{publicRoomId}}/messages
+
+### Get replies to a message
+GET {{baseUrl}}/api/messages/{{messageId}}/replies
+
+### Get specific message
+GET {{baseUrl}}/api/messages/{{messageId}}
+
+### Update message
+PATCH {{baseUrl}}/api/messages/{{messageId}}
+Content-Type: application/json
+
+{
+    "content": "Hello everyone! My golden retriever just learned an AMAZING new trick!"
+}
+
+### Search messages by content
+GET {{baseUrl}}/api/messages?room_id={{publicRoomId}}&search=retriever
+
+### Filter messages by author
+GET {{baseUrl}}/api/messages?room_id={{publicRoomId}}&author_id=user-001
+
+
+### ============================================================
+### Attachment Operations
+### ============================================================
+
+### Add attachment to existing message
+# @name addAttachment
+POST {{baseUrl}}/api/messages/{{messageId}}/attachments
+Content-Type: application/json
+
+{
+    "filename": "training_video.mp4",
+    "content_type": "video/mp4",
+    "size_bytes": 5242880,
+    "url": "https://storage.example.com/attachments/training_video.mp4"
+}
+
+###
+@attachmentId = {{addAttachment.response.body.id}}
+
+### List attachments for message
+GET {{baseUrl}}/api/messages/{{messageId}}/attachments
+
+### Get specific attachment
+GET {{baseUrl}}/api/attachments/{{attachmentId}}
+
+### Delete attachment
+DELETE {{baseUrl}}/api/attachments/{{attachmentId}}
+
+
+### ============================================================
+### Invitation Operations (Private Rooms)
+### ============================================================
+
+### Create invitation to private room
+# @name createInvitation
+POST {{baseUrl}}/api/invitations?inviter_id=user-001
+Content-Type: application/json
+
+{
+    "room_id": "{{privateRoomId}}",
+    "invitee_id": "user-002",
+    "message": "You are invited to join our exclusive VIP Pet Club!"
+}
+
+###
+@invitationId = {{createInvitation.response.body.id}}
+
+### Create another invitation
+# @name createInvitation2
+POST {{baseUrl}}/api/invitations?inviter_id=user-001
+Content-Type: application/json
+
+{
+    "room_id": "{{privateRoomId}}",
+    "invitee_id": "user-003"
+}
+
+###
+@invitationId2 = {{createInvitation2.response.body.id}}
+
+### Get invitation
+GET {{baseUrl}}/api/invitations/{{invitationId}}
+
+### List all invitations
+GET {{baseUrl}}/api/invitations
+
+### List pending invitations
+GET {{baseUrl}}/api/invitations?status=pending
+
+### List invitations for specific user
+GET {{baseUrl}}/api/invitations?invitee_id=user-002
+
+### Accept invitation
+POST {{baseUrl}}/api/invitations/{{invitationId}}/respond
+Content-Type: application/json
+
+{
+    "action": "accept"
+}
+
+### Decline invitation
+POST {{baseUrl}}/api/invitations/{{invitationId2}}/respond
+Content-Type: application/json
+
+{
+    "action": "decline"
+}
+
+### Verify member was added to room after accepting
+GET {{baseUrl}}/api/rooms/{{privateRoomId}}
+
+
+### ============================================================
+### Cleanup Operations
+### ============================================================
+
+### Delete message
+DELETE {{baseUrl}}/api/messages/{{messageId}}
+
+### Delete room (cascades to messages, invitations)
+DELETE {{baseUrl}}/api/rooms/{{publicRoomId}}
+
+### Delete private room
+DELETE {{baseUrl}}/api/rooms/{{privateRoomId}}
