@@ -1,0 +1,27 @@
+{
+  "name": "User001 Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.azurecli"
+      ]
+    }
+  },
+
+  "postCreateCommand": "echo 'Dev container ready!'",
+  
+  "remoteUser": "vscode"
+}
