@@ -1,0 +1,6 @@
+When did Microsoft released Microsoft Agent Framework SDK for Python and what is current version?
+#fetch 
+https://github.com/microsoft/agent-framework/releases
+https://learn.microsoft.com/en-us/agent-framework/overview/agent-framework-overview
+
+#githubRepo microsoft/agent-framework
